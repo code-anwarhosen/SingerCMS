@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Custom transitions */
+        /* Navbar - START */
         .mobile-menu {
-            transition: max-height 0.8s ease-out, opacity 0.2s ease-out;
+            transition: max-height 0.5s ease-out, opacity 0.2s ease-out;
             max-height: 0;
             opacity: 0;
             overflow: hidden;
@@ -24,7 +24,7 @@
         /* Link hover and active states */
         .nav-link {
             position: relative;
-            transition: color 1s ease;
+            transition: color 0.5s ease;
         }
         .nav-link::after {
             content: '';
@@ -40,6 +40,29 @@
         .nav-link.active::after {
             width: 100%;
         }
+        /* Navbar - END */
+
+        /* Search modal transition - START */
+        .search-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .search-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .search-modal.active .modal-content {
+            transform: scale(1);
+        }
+        /* Search modal transition - END */
     </style>
 </head>
 <body class="bg-gray-900">
@@ -47,7 +70,7 @@
     <!-- Navigation Bar -->
     <nav class="bg-gray-900 border-b border-gray-600">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-12">
+            <div class="flex items-center justify-between h-16">
 
                 <!-- Left Section - Brand -->
                 <div class="flex-shrink-0 flex items-center">
@@ -58,8 +81,8 @@
 
                 <!-- Right Section -->
                 <div class="flex items-center space-x-4">
-                    <!-- Desktop Search Icon -->
-                    <button class="md:-mb-2 p-2 text-gray-400 hover:text-white" onclick="openSearchModal()">
+                    <!-- Search Icon -->
+                    <button class="md:-mb-2 text-gray-400 hover:text-white mr-2 hover:bg-gray-700 p-2 rounded-xl" onclick="openSearchModal()">
                         <i class="fas fa-search w-5 h-5"></i>
                     </button>
 
@@ -81,7 +104,7 @@
 
                     <!-- Mobile Menu Button -->
                     <div class="md:hidden flex items-center space-x-2">
-                        <button class="text-gray-400 hover:text-white p-2" onclick="toggleMobileMenu()">
+                        <button class="text-gray-400 hover:bg-gray-700 p-2 rounded-xl" onclick="toggleMobileMenu()">
                             <i class="fas fa-bars w-6 h-6"></i>
                         </button>
                     </div>
@@ -109,38 +132,46 @@
     </nav>
 
     <!-- Search Modal -->
-    <div id="searchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50">
-        <div class="relative max-w-2xl mx-auto mt-20 p-6 bg-gray-800 rounded-lg transform transition-all">
-            <!-- Search Input -->
-            <input type="text" 
-                   class="w-full bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Search customers...">
-            
+    <div id="searchModal" class="search-modal fixed inset-0 z-50 bg-black bg-opacity-50">
+        <div class="modal-content relative max-w-[90vw] md:max-w-xl mx-auto mt-20 p-6 bg-gray-800 rounded-lg">
+            <!-- Search Header -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex-1 mr-4">
+                    <div class="flex gap-2">
+                        <input type="text" 
+                            class="w-full bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none"
+                            placeholder="Search...">
+                        <select class="bg-gray-700 text-white rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="account">Account</option>
+                            <option value="name">Name</option>
+                            <option value="phone">Phone</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="closeSearchModal()" 
+                        class="text-gray-400 hover:text-white ml-2">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+
             <!-- Search Results -->
-            <div class="mt-4 space-y-4 max-h-96 overflow-y-auto">
+            <div class="space-y-4 max-h-96 overflow-y-auto">
                 <!-- Sample Customer -->
-                <a href="#" class="flex items-center p-3 hover:bg-gray-700 rounded-lg transition-colors">
+                <a href="#" class="flex items-center p-3 bg-gray-700 hover:bg-gray-500 rounded-lg transition-colors">
                     <img src="https://via.placeholder.com/40" 
                          class="rounded-full w-10 h-10" 
                          alt="Customer Avatar">
                     <div class="ml-4">
                         <h3 class="text-white font-medium">John Doe</h3>
-                        <p class="text-gray-400 text-sm">Acc: 123456789</p>
-                        <p class="text-blue-400 text-sm">Product: Smart TV 55"</p>
+                        <p class="text-gray-400 text-sm">DKC-H208</p>
                     </div>
                 </a>
+                <!-- Add more sample entries as needed -->
             </div>
-
-            <!-- Close Button -->
-            <button onclick="closeSearchModal()" 
-                    class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <i class="fas fa-times fa-lg"></i>
-            </button>
         </div>
     </div>
 
     <script>
-        let isModalOpen = false;
         let activeLink = document.querySelector('.nav-link.active');
 
         // Mobile Menu Toggle
@@ -156,32 +187,21 @@
             activeLink = clickedLink;
         }
 
-        // Modal Handling with Transitions
+        // Modal Handling with Enhanced Transitions
         function openSearchModal() {
             const modal = document.getElementById('searchModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.querySelector('div').classList.add('modal-enter-active');
-            }, 10);
+            modal.classList.add('active');
+            setTimeout(() => modal.querySelector('input').focus(), 300);
         }
 
         function closeSearchModal() {
             const modal = document.getElementById('searchModal');
-            modal.querySelector('div').classList.remove('modal-enter-active');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
+            modal.classList.remove('active');
         }
 
-        // Close modal handlers
+        // Event Listeners
         document.getElementById('searchModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('searchModal')) {
-                closeSearchModal();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !document.getElementById('searchModal').classList.contains('hidden')) {
                 closeSearchModal();
             }
         });
