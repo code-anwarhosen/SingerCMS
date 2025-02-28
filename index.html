@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroHire - Dashboard</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Custom transitions */
+        .mobile-menu {
+            transition: max-height 0.8s ease-out, opacity 0.2s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        /* Link hover and active states */
+        .nav-link {
+            position: relative;
+            transition: color 1s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #3b82f6;
+            transition: width 0.5s ease;
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-gray-900 border-b border-gray-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-12">
+
+                <!-- Left Section - Brand -->
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-red-500">
+                        SINGER<span class="text-blue-500">CMS</span>
+                    </span>
+                </div>
+
+                <!-- Right Section -->
+                <div class="flex items-center space-x-4">
+                    <!-- Desktop Search Icon -->
+                    <button class="md:-mb-2 p-2 text-gray-400 hover:text-white" onclick="openSearchModal()">
+                        <i class="fas fa-search w-5 h-5"></i>
+                    </button>
+
+                    <!-- Desktop Links -->
+                    <div class="hidden md:flex items-center space-x-6 font-semibold">
+                        <a href="#" class="nav-link text-gray-300 active" onclick="setActiveLink(this)">
+                            Home
+                        </a>
+                        <a href="#" class="nav-link text-gray-300" onclick="setActiveLink(this)">
+                            Products
+                        </a>
+                        <a href="#" class="nav-link text-gray-300" onclick="setActiveLink(this)">
+                            Cart
+                        </a>
+                        <a href="#" class="nav-link text-gray-300" onclick="setActiveLink(this)">
+                            Profile
+                        </a>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden flex items-center space-x-2">
+                        <button class="text-gray-400 hover:text-white p-2" onclick="toggleMobileMenu()">
+                            <i class="fas fa-bars w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu md:hidden bg-gray-800 font-semibold" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#" class="nav-link text-gray-300 active block px-3 py-2" onclick="setActiveLink(this)">
+                    Home
+                </a>
+                <a href="#" class="nav-link text-gray-300 block px-3 py-2" onclick="setActiveLink(this)">
+                    Products
+                </a>
+                <a href="#" class="nav-link text-gray-300 block px-3 py-2" onclick="setActiveLink(this)">
+                    Cart
+                </a>
+                <a href="#" class="nav-link text-gray-300 block px-3 py-2" onclick="setActiveLink(this)">
+                    Profile
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="relative max-w-2xl mx-auto mt-20 p-6 bg-gray-800 rounded-lg transform transition-all">
+            <!-- Search Input -->
+            <input type="text" 
+                   class="w-full bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Search customers...">
+            
+            <!-- Search Results -->
+            <div class="mt-4 space-y-4 max-h-96 overflow-y-auto">
+                <!-- Sample Customer -->
+                <a href="#" class="flex items-center p-3 hover:bg-gray-700 rounded-lg transition-colors">
+                    <img src="https://via.placeholder.com/40" 
+                         class="rounded-full w-10 h-10" 
+                         alt="Customer Avatar">
+                    <div class="ml-4">
+                        <h3 class="text-white font-medium">John Doe</h3>
+                        <p class="text-gray-400 text-sm">Acc: 123456789</p>
+                        <p class="text-blue-400 text-sm">Product: Smart TV 55"</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Close Button -->
+            <button onclick="closeSearchModal()" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let isModalOpen = false;
+        let activeLink = document.querySelector('.nav-link.active');
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('open');
+        }
+
+        // Active Link Management
+        function setActiveLink(clickedLink) {
+            if (activeLink) activeLink.classList.remove('active');
+            clickedLink.classList.add('active');
+            activeLink = clickedLink;
+        }
+
+        // Modal Handling with Transitions
+        function openSearchModal() {
+            const modal = document.getElementById('searchModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.querySelector('div').classList.add('modal-enter-active');
+            }, 10);
+        }
+
+        function closeSearchModal() {
+            const modal = document.getElementById('searchModal');
+            modal.querySelector('div').classList.remove('modal-enter-active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Close modal handlers
+        document.getElementById('searchModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('searchModal')) {
+                closeSearchModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !document.getElementById('searchModal').classList.contains('hidden')) {
+                closeSearchModal();
+            }
+        });
+    </script>
+</body>
+</html>
