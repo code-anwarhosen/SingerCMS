@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .person-card {
+            animation: slideIn 0.3s ease forwards;
+            opacity: 0;
+        }
+
+        /* Custom scrollbar for the list */
+        .scrollable-list {
+            scrollbar-width: thin;
+            scrollbar-color: #4a5568 #2d3748;
+        }
+
+        .scrollable-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable-list::-webkit-scrollbar-track {
+            background: #2d3748;
+            border-radius: 4px;
+        }
+
+        .scrollable-list::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 4px;
+        }
+
+        .scrollable-list::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen text-gray-100 font-['Inter']">
+    
+    <!-- Header -->
+    <header class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Singer BD Ltd.
+            </h1>
+            <button class="flex items-center bg-blue-600 hover:bg-blue-500 text-white px-3 py-3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 rounded-full transition-all">
+                <i class="fas fa-plus mr-2"></i>
+                Add
+            </button>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto p-6">
+
+        <!-- Search Box -->
+        <div class="mb-6">
+            <div class="relative">
+                <div class="flex items-center bg-gray-800/50 rounded-full">
+                    <div class="absolute inset-y-0 left-1 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </div>
+
+                    <input type="text" id="searchInput" placeholder="Search customers ..."
+                        class="w-full pl-12 pr-24 py-3 bg-transparent focus:outline-none focus:ring-0"
+                    >
+                    <div class="absolute right-1 inset-y-0 flex items-center pr-2">
+                        <select id="searchType"
+                            class="bg-transparent text-gray-400 focus:outline-none focus:ring-0"
+                        >
+                            <option value="name">Name</option>
+                            <option value="phone">Phone</option>
+                            <option value="account">Account</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- People List Container -->
+        <div class="bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+            <!-- List Header -->
+            <div class="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-800/30 border-b border-gray-600 font-bold">
+                <div class="col-span-4 text-gray-400">Customer</div>
+                <div class="col-span-3 text-gray-400">Contact</div>
+                <div class="col-span-3 text-gray-400">Account</div>
+                <div class="col-span-2 text-gray-400 text-right">Due Amount</div>
+            </div>
+
+            <!-- People List -->
+            <div id="peopleList" class="scrollable-list divide-y divide-gray-700 max-h-[500px] overflow-y-auto">
+                <!-- People will be dynamically inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden p-8 text-center text-gray-400">
+                <i class="fas fa-user-slash text-3xl mb-4"></i>
+                <p>No customers found</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const people = [
+            {
+                name: "John Doe",
+                phone: "+880 1712-345678",
+                account: "ACC-123456",
+                due: "৳ 5,000",
+                avatar: "https://via.placeholder.com/40",
+                status: "Active"
+            },
+            {
+                name: "Jane Smith",
+                phone: "+880 1812-987654",
+                account: "ACC-654321",
+                due: "৳ 2,500",
+                avatar: "https://via.placeholder.com/40",
+                status: "Overdue"
+            },
+            {
+                name: "Alice Johnson",
+                phone: "+880 1912-555555",
+                account: "ACC-987654",
+                due: "৳ 7,000",
+                avatar: "https://via.placeholder.com/40",
+                status: "Active"
+            },
+            {
+                name: "Bob Brown",
+                phone: "+880 1612-111111",
+                account: "ACC-456789",
+                due: "৳ 3,200",
+                avatar: "https://via.placeholder.com/40",
+                status: "Pending"
+            }
+        ];
+
+        // Function to render people list
+        function renderPeopleList(filteredPeople) {
+            const peopleList = document.getElementById('peopleList');
+            const emptyState = document.getElementById('emptyState');
+            
+            peopleList.innerHTML = filteredPeople.map((person, index) => `
+                <a href="#" class="person-card block grid grid-cols-12 gap-4 items-center px-6 py-3 hover:bg-gray-700/20 transition-all" style="animation-delay: ${index * 50}ms">
+                    <div class="col-span-4 flex items-center gap-4">
+                        <img src="${person.avatar}" class="w-10 h-10 rounded-full">
+                        <div>
+                            <h3 class="font-medium">${person.name}</h3>
+                            <span class="text-xs ${person.status === 'Active' ? 'text-green-400' : person.status === 'Overdue' ? 'text-red-400' : 'text-yellow-400'}">
+                                ${person.status}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-span-3 text-gray-400">${person.phone}</div>
+                    <div class="col-span-3 font-mono text-sm">${person.account}</div>
+                    <div class="col-span-2 text-right font-medium ${person.status === 'Overdue' ? 'text-red-400' : 'text-blue-400'}">
+                        ${person.due}
+                    </div>
+                </a>
+            `).join('');
+
+            emptyState.classList.toggle('hidden', filteredPeople.length > 0);
+            peopleList.classList.toggle('hidden', filteredPeople.length === 0);
+        }
+
+        // Debounce function for smooth filtering
+        let timeout;
+        function filterPeople() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const searchInput = document.getElementById('searchInput').value.toLowerCase();
+                const searchType = document.getElementById('searchType').value;
+
+                const filteredPeople = people.filter(person => {
+                    const searchValue = person[searchType].toLowerCase();
+                    return searchValue.includes(searchInput);
+                });
+
+                renderPeopleList(filteredPeople);
+            }, 300);
+        }
+
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('input', filterPeople);
+        document.getElementById('searchType').addEventListener('change', filterPeople);
+
+        // Initial render
+        renderPeopleList(people);
+    </script>
+</body>
+</html>
